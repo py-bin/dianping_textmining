@@ -2,7 +2,7 @@
 
 [TOC]
 
-##一、爬虫
+## 一、爬虫
 
 ### 整体思路
 
@@ -10,7 +10,7 @@
 
 ### 网页爬取和解析
 
-链接格式为"http://www.dianping.com/shop/" + shopID + "/review_all/" + pi，如：http://www.dianping.com/shop/518986/review_all/p1，一页评论有20条。我们使用for循环构造链接URL，使用requests库发起请求并把html页面爬取下来，通过BeautifulSoup和re库解析页面提取信息。
+链接格式为"http://www.dianping.com/shop/" + shopID + "/review_all/" + pi，如：http://www.dianping.com/shop/518986/review_all/p1 ，一页评论有20条。我们使用for循环构造链接URL，使用requests库发起请求并把html页面爬取下来，通过BeautifulSoup和re库解析页面提取信息。
 
 我们发现完整的评论都存储在'div','main-review'中，且部分页面口味、环境、服务并不是每一页都有，因此需要使用try...except...防止程序中断，BeautifulSoup部分代码如下：
 
@@ -103,7 +103,7 @@ def save_data(data_dict):
 
 ## 三、评论文本的情感分析
 
-###数据清洗
+### 数据清洗
 
 ### 中文分词
 
