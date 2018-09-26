@@ -18,7 +18,7 @@ import os
 ua = UserAgent()
 
 #设置cookies
-cookie = "_lxsdk_cuid=162760423dfc8-0801f141cb0731-3b60490d-e1000-162760423dfc8; _lxsdk=162760423dfc8-0801f141cb0731-3b60490d-e1000-162760423dfc8; _hc.v=af7219c3-2b99-8bb8-f9b2-7b1d9be7f29e.1522398406; s_ViewType=10; ua=%E4%BB%A4%E7%8B%90%E5%86%B2; ctu=029e953356caf94d20233d299a70d285a03cb64585c371690b17d3e59c4c075c; cye=guangzhou; Hm_lvt_e6f449471d3527d58c46e24efb4c343e=1531964746; cy=4; dper=8c6ae023e893759ea57ce154028f180070cc7d1c04b6b70eba95f5d35b1d8ddd82e11aa51441187a6431063dfe2cd7b4fb2dd1eb4d13d9a61381de2fbaac2d10fb88310ef5ae6504f5bf44395249a1c8c85a2b14e06b3ed82b6849e225e5b6a3; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; ll=7fd06e815b796be3df069dec7836c3df; _lxsdk_s=166137f187f-0b6-191-c14%7C%7C68"
+cookie = "_lxsdk_cuid=162760423dfc8-0801f141cb0731-3b60490d-e1000-162760423dfc8; _lxsdk=162760423dfc8-0801f141cb0731-3b60490d-e1000-162760423dfc8; _hc.v=af7219c3-2b99-8bb8-f9b2-7b1d9be7f29e.1522398406; s_ViewType=10; ua=%E4%BB%A4%E7%8B%90%E5%86%B2; ctu=029e953356caf94d20233d299a70d285a03cb64585c371690b17d3e59c4c075c; cye=guangzhou; Hm_lvt_e6f449471d3527d58c46e24efb4c343e=1531964746; cy=4; ll=7fd06e815b796be3df069dec7836c3df; dper=8c6ae023e893759ea57ce154028f180038a547fe8a3f401696315458fe9625c9691c66f767e5afe7fc4fc5505c4387e7e371ae38b400d7ac5398410e6ab1e01dd3c0c7d88334c95db28f00a8416881765249a931947006e75cc0be210d8b3b01; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; _lxsdk_s=16613beab41-681-f38-c9e%7C%7C440"
 
 #修改请求头
 headers = {
@@ -26,13 +26,24 @@ headers = {
         'Cookie':cookie,
         'Connection':'keep-alive',
         'Host':'www.dianping.com',
+        'Referer': 'http://www.dianping.com/shop/518986/review_all'
 }
+
+#从ip代理池中随机获取ip
+#ips = open('proxies.txt','r').read().split('\n')
+#
+#def get_random_ip():
+#    ip = random.choice(ips)
+#    pxs = {ip.split(':')[0]:ip}
+#    return pxs
 
 #获取html页面
 def getHTMLText(url,code="utf-8"):
     try:
         time.sleep(random.random()*6 + 5)
-        r=requests.get(url, timeout = 5, headers=headers)
+        r=requests.get(url, timeout = 5, headers=headers, 
+#                       proxies=get_random_ip()
+                       )
         r.raise_for_status()
         r.encoding = code
         return r.text
@@ -88,24 +99,28 @@ def getCommentinfo(shop_url, shpoID, page_begin, page_end):
             for info in infoList:
                 mysqls.save_data(info)
             #断点续传中的断点
-            with open('xuchuan.txt','a') as file:
-                duandian = str(i)+'\n'
-                file.write(duandian)
+            if html != "产生异常":
+                with open('xuchuan.txt','a') as file:
+                    duandian = str(i)+'\n'
+                    file.write(duandian)
         except:
             continue
     return
 
-#根据店铺id，店铺页码进行爬取
-def craw_comment(shopID='518986',page = 699):
-    shop_url = "http://www.dianping.com/shop/" + shopID + "/review_all/"
-    #断点续传中的续传
+def xuchuan():
     if os.path.exists('xuchuan.txt'):
         file = open('xuchuan.txt','r')
         nowpage = int(file.readlines()[-1])
         file.close()
     else:
         nowpage = 0
-    
+    return nowpage
+
+#根据店铺id，店铺页码进行爬取
+def craw_comment(shopID='518986',page = 699):
+    shop_url = "http://www.dianping.com/shop/" + shopID + "/review_all/"
+    #读取断点续传中的续传断点
+    nowpage = xuchuan()
     getCommentinfo(shop_url, shopID, page_begin=nowpage+1, page_end=page+1)
     mysqls.close_sql()
     return
