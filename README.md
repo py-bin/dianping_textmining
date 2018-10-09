@@ -105,7 +105,7 @@ def save_data(data_dict):
 
 2. 样本分布
 
-   ![data_head](文本分析挖掘/source/sourcestars.png)
+   ![data_head](文本分析挖掘/source/stars.png)
 
 3. 各店铺评分分布
 
