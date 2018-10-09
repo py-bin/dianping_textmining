@@ -95,17 +95,81 @@ def save_data(data_dict):
 
 6. **设置断点续传**：即使降低了爬取频率，有时还是会被美团的网络工程师抓到的，小哥哥饶命啊~。因此我们需要一个断点续传的小功能，避免每次都从头开始爬。思路是建一个文本文件，存储当前爬取的进度，每次运行程序时都出当前进度开始，详见代码~
 
-## 二、数据分析
+## 二、探索性分析与文本数据预处理
 
-### 数据集探索
+### 探索性分析
 
-### 数据可视化分析
+1. 查看数据大小以及基础信息 ，浏览数据
+
+   ![data_head](文本分析挖掘/source/data_head.png)
+
+2. 样本分布
+
+   ![data_head](文本分析挖掘/source/sourcestars.png)
+
+3. 各店铺评分分布
+
+   ![data_head](文本分析挖掘/source/dianpu.png)
+
+4. 点评数的的时间分布
+
+   ![data_head](文本分析挖掘/source/time.png)
+
+5. 查看评论长度对结果影响
+
+   ![data_head](文本分析挖掘/source/len.png)
+### 数据预处理
+
+1. **去除非文本数据：**可以看出，爬虫获取的数据非常多类似“\xa0”的非文本数据，而且都还有一些无意义的干扰数据，如结尾的“收起评论” 
+
+   ``` python
+   #除去非文本数据和无意义文本
+   data['cus_comment'] = data['cus_comment'].str.replace(r'[^\u4e00-\u9fa5]','').str.replace('收起评论','')
+   ```
+
+2. **中文分词：**中文文本数据处理，怎么能离开中文分词呢，我们使用jieba库，简单又好用。这里我们把文本字符串处理为以空格区隔的分词字符串 
+   ``` python
+   #中文分词
+   import jieba
+   data['cus_comment'] = data['cus_comment'].apply(lambda x:' '.join(jieba.cut(x)))
+   ```
+
+3. **去除停用词：**文本中有很多无效的词，比如“着”，“和”，还有一些标点符号，这些我们不想在文本分析的时候引入，因此需要去掉，因为wordcloud和TF-IDF都支持停用词，因此就不额外处理了 
+
+### 词云展示
+
+``` python
+from wordcloud import WordCloud, STOPWORDS #导入模块worldcloud
+from PIL import Image #导入模块PIL(Python Imaging Library)图像处理库
+import numpy as np #导入模块numpy，多维数组
+import matplotlib.pyplot as plt #导入模块matplotlib，作图
+import matplotlib
+matplotlib.rcParams['font.sans-serif'] = ['KaiTi']#作图的中文
+matplotlib.rcParams['font.serif'] = ['KaiTi']#作图的中文
+
+infile = open("stopwords.txt",encoding='utf-8')
+stopwords_lst = infile.readlines()
+STOPWORDS = [x.strip() for x in stopwords_lst]
+stopwords = set(STOPWORDS) #设置停用词
+
+def ciyun(shop_ID='all'):
+    
+    texts = data['cus_comment']
+    if shop_ID == 'all':
+        text = ' '.join(texts)
+    else:
+        text = ' '.join(texts[data['shopID']==shop_ID])
+    
+    wc = WordCloud(font_path="msyh.ttc", background_color='white', max_words=100, stopwords=stopwords, max_font_size=80, random_state=42, margin=3) #配置词云参数
+    wc.generate(text) #生成词云
+    plt.imshow(wc,interpolation="bilinear")#作图
+    plt.axis("off") #不显示坐标轴
+    
+ciyun('520004')
+```
+![wordcloud](文本分析挖掘/source/wordcloud.png)
 
 ## 三、评论文本的情感分析
-
-### 数据清洗
-
-### 中文分词
 
 ### 文本特征提取（TF-IDF）
 
