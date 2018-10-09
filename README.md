@@ -138,35 +138,6 @@ def save_data(data_dict):
 
 ### 词云展示
 
-``` python
-from wordcloud import WordCloud, STOPWORDS #导入模块worldcloud
-from PIL import Image #导入模块PIL(Python Imaging Library)图像处理库
-import numpy as np #导入模块numpy，多维数组
-import matplotlib.pyplot as plt #导入模块matplotlib，作图
-import matplotlib
-matplotlib.rcParams['font.sans-serif'] = ['KaiTi']#作图的中文
-matplotlib.rcParams['font.serif'] = ['KaiTi']#作图的中文
-
-infile = open("stopwords.txt",encoding='utf-8')
-stopwords_lst = infile.readlines()
-STOPWORDS = [x.strip() for x in stopwords_lst]
-stopwords = set(STOPWORDS) #设置停用词
-
-def ciyun(shop_ID='all'):
-    
-    texts = data['cus_comment']
-    if shop_ID == 'all':
-        text = ' '.join(texts)
-    else:
-        text = ' '.join(texts[data['shopID']==shop_ID])
-    
-    wc = WordCloud(font_path="msyh.ttc", background_color='white', max_words=100, stopwords=stopwords, max_font_size=80, random_state=42, margin=3) #配置词云参数
-    wc.generate(text) #生成词云
-    plt.imshow(wc,interpolation="bilinear")#作图
-    plt.axis("off") #不显示坐标轴
-    
-ciyun('520004')
-```
 ![wordcloud](文本分析挖掘/source/wordcloud.png)
 
 ## 三、评论文本的情感分析
